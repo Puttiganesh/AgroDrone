@@ -49,7 +49,10 @@ if os.path.exists(ADMIN_WEB_DIR):
 
 @app.on_event("startup")
 def on_startup():
-    init_db()
+    try:
+        init_db()
+    except OSError as exc:
+        print(f"[AgroDrone DB] Startup database initialization skipped: {exc}")
     print("🚀 [AgroDrone] Backend Server is ready!")
     print("🌾 Admin Dashboard available at: http://localhost:8000/admin")
     print("📡 Swagger API Docs available at: http://localhost:8000/docs")

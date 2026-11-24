@@ -13,6 +13,11 @@ DB_FILE = os.path.join(os.path.dirname(__file__), "..", "database", "agrodrone.d
 SQL_FILE = os.path.join(os.path.dirname(__file__), "..", "database", "agrodrone.sql")
 
 def get_db_path() -> str:
+    if os.environ.get("VERCEL"):
+        db_path = "/tmp/agrodrone.db"
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        return db_path
+
     os.makedirs(os.path.dirname(DB_FILE), exist_ok=True)
     return DB_FILE
 
