@@ -1,0 +1,884 @@
+/* ==========================================================
+   AgroDrone - Autonomous Agriculture Fleet & Intelligence
+   Modern Theme Stylesheet
+   ========================================================== */
+
+:root {
+  --primary: #10b981;
+  --primary-hover: #059669;
+  --primary-dark: #064e3b;
+  --primary-glow: rgba(16, 185, 129, 0.35);
+  
+  --bg-dark: #0b1120;
+  --bg-card: #131d31;
+  --bg-card-hover: #1e2c47;
+  --bg-hud: rgba(15, 23, 42, 0.85);
+  
+  --border-color: #243553;
+  --border-light: #334b73;
+  
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  
+  --accent-amber: #f59e0b;
+  --accent-red: #ef4444;
+  --accent-blue: #38bdf8;
+  --accent-purple: #a855f7;
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px var(--primary-glow);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* Animations */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 10px var(--primary-glow); }
+  50% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.7); }
+}
+
+@keyframes rotorSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes scanLine {
+  0% { top: 0%; opacity: 0.9; }
+  100% { top: 100%; opacity: 0.2; }
+}
+
+@keyframes liveDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.5; }
+}
+
+/* Header & Top Navbar */
+.navbar {
+  background-color: rgba(19, 29, 49, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.9rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.brand-logo {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #10b981, #047857);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 16px var(--primary-glow);
+}
+
+.brand-logo svg {
+  width: 26px;
+  height: 26px;
+  fill: #fff;
+}
+
+.brand-text h1 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.badge-version {
+  font-size: 0.65rem;
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--primary);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  padding: 2px 7px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.brand-text p {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #0d1525;
+  padding: 0.3rem 0.4rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+}
+
+.nav-tab {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.nav-tab:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-tab.active {
+  background: var(--primary);
+  color: #052e16;
+  font-weight: 700;
+  box-shadow: 0 2px 10px var(--primary-glow);
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.live-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.4rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.live-indicator {
+  width: 8px;
+  height: 8px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  animation: liveDot 1.5s infinite ease-in-out;
+}
+
+.weather-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 0.4rem 0.85rem;
+  border-radius: 20px;
+}
+
+/* Main Layout & Metrics Banner */
+.main-container {
+  padding: 1.5rem 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+  flex: 1;
+}
+
+.metrics-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.2rem;
+  margin-bottom: 1.6rem;
+}
+
+.metric-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.4rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-light);
+}
+
+.metric-info h4 {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.35rem;
+}
+
+.metric-info .metric-num {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.metric-sub {
+  font-size: 0.75rem;
+  color: var(--primary);
+  margin-top: 0.25rem;
+}
+
+.metric-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+.icon-green { background: rgba(16, 185, 129, 0.15); color: var(--primary); }
+.icon-blue { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); }
+.icon-amber { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+.icon-purple { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); }
+
+/* Tab Content Panes */
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+/* Telemetry Screen & Map Grid */
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  min-height: 620px;
+}
+
+.map-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+}
+
+.map-toolbar {
+  padding: 0.8rem 1.2rem;
+  background: rgba(15, 23, 42, 0.9);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.toolbar-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.btn-ctrl {
+  background: #1e293b;
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s;
+}
+
+.btn-ctrl:hover {
+  background: #334155;
+  color: #fff;
+}
+
+.btn-ctrl.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #064e3b;
+}
+
+.btn-ctrl.btn-primary:hover {
+  background: #34d399;
+}
+
+.canvas-map-area {
+  flex: 1;
+  position: relative;
+  background: radial-gradient(circle at 50% 50%, #0d1b2a, #060b13);
+  min-height: 520px;
+}
+
+#flightCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Floating HUD on Map */
+.map-hud-overlay {
+  position: absolute;
+  bottom: 1.2rem;
+  left: 1.2rem;
+  right: 1.2rem;
+  background: var(--bg-hud);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1.2rem;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  z-index: 15;
+}
+
+.hud-item {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  padding-right: 0.8rem;
+}
+
+.hud-item:last-child {
+  border-right: none;
+}
+
+.hud-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.2rem;
+}
+
+.hud-val {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #fff;
+  font-family: 'Courier New', monospace;
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.hud-unit {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: sans-serif;
+  font-weight: normal;
+}
+
+/* Telemetry Sidebar Right */
+.telemetry-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.drone-card-active {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.4rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.drone-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.8rem;
+}
+
+.drone-model-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.drone-serial {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.status-badge {
+  padding: 0.25rem 0.7rem;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-in_mission { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.4); }
+.status-idle { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
+.status-charging { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+
+.gauge-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.gauge-box {
+  background: #0f172a;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.8rem;
+  text-align: center;
+}
+
+.gauge-title {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+}
+
+.progress-bar-container {
+  height: 8px;
+  background: #1e293b;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0.4rem 0;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.fill-battery { background: linear-gradient(90deg, #10b981, #34d399); }
+.fill-tank { background: linear-gradient(90deg, #38bdf8, #0284c7); }
+
+.flight-log-list {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.2rem;
+  flex: 1;
+}
+
+.section-head {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.9rem;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.log-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.8rem;
+}
+
+.log-item:last-child {
+  border-bottom: none;
+}
+
+/* Dispatch & Bookings Table */
+.data-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.table-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filter-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filter-btn {
+  background: #0f172a;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn.active, .filter-btn:hover {
+  background: #1e293b;
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.agro-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.agro-table th {
+  background: #0f172a;
+  padding: 0.9rem 1rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.agro-table td {
+  padding: 1rem;
+  font-size: 0.86rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
+}
+
+.agro-table tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.action-btn-group {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.action-btn {
+  background: #1e293b;
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  background: var(--primary);
+  color: #064e3b;
+}
+
+/* AI Crop Intelligence Grid */
+.ai-view-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 1.5rem;
+}
+
+.ai-scan-viewer {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.4rem;
+  position: relative;
+}
+
+.heatmap-viewport {
+  width: 100%;
+  height: 380px;
+  background-size: cover;
+  background-position: center;
+  border-radius: var(--radius-md);
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.7);
+}
+
+.ndvi-scale-bar {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  bottom: 1rem;
+  width: 28px;
+  background: linear-gradient(to bottom, #10b981, #84cc16, #eab308, #ef4444);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #000;
+}
+
+.ai-stats-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.alert-pest {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-left: 4px solid var(--accent-red);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+}
+
+.alert-pest h5 {
+  color: #f87171;
+  font-size: 0.92rem;
+  margin-bottom: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.vra-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
+.vra-card {
+  background: #0f172a;
+  border: 1px solid var(--border-color);
+  padding: 0.8rem;
+  border-radius: var(--radius-sm);
+}
+
+/* Simulated Smartphone Wrappers for Farmer & Operator Apps */
+.sim-viewport-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem;
+  flex-wrap: wrap;
+  padding: 1rem 0;
+}
+
+.phone-mockup {
+  width: 390px;
+  height: 780px;
+  background: #000;
+  border: 12px solid #1e293b;
+  border-radius: 44px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.phone-notch {
+  width: 140px;
+  height: 24px;
+  background: #1e293b;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+}
+
+.phone-screen {
+  flex: 1;
+  background: #f8fafc;
+  color: #0f172a;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding-top: 28px;
+}
+
+.phone-header {
+  background: linear-gradient(135deg, #059669, #047857);
+  color: #fff;
+  padding: 1.2rem 1.2rem 1.6rem 1.2rem;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.phone-header h3 {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.phone-body {
+  padding: 1rem;
+  flex: 1;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 0.35rem;
+}
+
+.form-select, .form-input {
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #0f172a;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.btn-book-now {
+  width: 100%;
+  background: #059669;
+  color: #fff;
+  border: none;
+  padding: 0.85rem;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.4);
+  transition: background 0.2s;
+}
+
+.btn-book-now:hover {
+  background: #047857;
+}
+
+/* Modal Windows */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  width: 90%;
+  max-width: 540px;
+  padding: 1.8rem;
+  box-shadow: var(--shadow-lg);
+  animation: modalPop 0.2s ease-out;
+}
+
+@keyframes modalPop {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.4rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.8rem;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.close-btn:hover { color: #fff; }
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .telemetry-grid, .ai-view-grid {
+    grid-template-columns: 1fr;
+  }
+  .navbar {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+}
