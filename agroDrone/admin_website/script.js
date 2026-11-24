@@ -5,7 +5,7 @@
 
 // Application State
 const STATE = {
-  backendUrl: "http://localhost:8000/api",
+  backendUrl: "/api",
   activeTab: "telemetry",
   simRunning: true,
   simStep: 0,
