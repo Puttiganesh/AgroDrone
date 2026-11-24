@@ -1,0 +1,10 @@
+{
+  "buildCommand": null,
+  "outputDirectory": "agroDrone/admin_website",
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index.py" },
+    { "source": "/docs", "destination": "/api/index.py" },
+    { "source": "/openapi.json", "destination": "/api/index.py" },
+    { "source": "/admin/:path*", "destination": "/api/index.py" }
+  ]
+}
