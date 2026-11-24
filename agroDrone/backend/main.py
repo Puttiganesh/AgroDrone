@@ -43,7 +43,7 @@ app.include_router(payment_router)
 
 # Mount Admin Website Static Assets
 ADMIN_WEB_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "admin_website"))
-PUBLIC_WEB_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "public"))
+PUBLIC_WEB_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "static"))
 
 if os.path.exists(ADMIN_WEB_DIR):
     app.mount("/admin", StaticFiles(directory=ADMIN_WEB_DIR, html=True), name="admin_website")
