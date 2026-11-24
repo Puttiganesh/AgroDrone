@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgroDrone - Autonomous Agriculture Fleet & AI Intelligence</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="brand-section">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>AgroDrone <span class="badge-version">v2.0 Pro</span></h1>
+        <p>Autonomous Drone Spraying & Crop Intelligence Platform</p>
+      </div>
+    </div>
+
+    <nav class="nav-links">
+      <button class="nav-tab active" data-tab="telemetry">
+        <span>🛸</span> Fleet Telemetry
+      </button>
+      <button class="nav-tab" data-tab="dispatch">
+        <span>📋</span> Mission Dispatch
+      </button>
+      <button class="nav-tab" data-tab="ai-intelligence">
+        <span>🧠</span> AI Crop NDVI
+      </button>
+      <button class="nav-tab" data-tab="farmer-portal">
+        <span>👨‍🌾</span> Farmer App View
+      </button>
+      <button class="nav-tab" data-tab="operator-cockpit">
+        <span>🎮</span> Pilot Cockpit View
+      </button>
+    </nav>
+
+    <div class="header-status">
+      <div class="live-pill">
+        <div class="live-indicator"></div>
+        <span id="connStatus">TELEMETRY LIVE</span>
+      </div>
+      <div class="weather-indicator" id="weatherBadge">
+        <span>🌤️</span> <span>24.5°C | Wind: 6.4 km/h</span> <strong style="color: #10b981;">SAFE</strong>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+
+    <!-- KPI Metric Cards -->
+    <div class="metrics-row">
+      <div class="metric-card">
+        <div class="metric-info">
+          <h4>Active Fleet</h4>
+          <div class="metric-num" id="metricFleet">4 Drones</div>
+          <div class="metric-sub">1 In-Flight Mission • 3 Ready</div>
+        </div>
+        <div class="metric-icon icon-green">🛸</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-info">
+          <h4>Acreage Treated</h4>
+          <div class="metric-num" id="metricAcres">43.5 Acres</div>
+          <div class="metric-sub">Today's Spray Coverage</div>
+        </div>
+        <div class="metric-icon icon-blue">🌾</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-info">
+          <h4>Chemical Saved</h4>
+          <div class="metric-num">38.4%</div>
+          <div class="metric-sub">AI Variable Rate Prescription</div>
+        </div>
+        <div class="metric-icon icon-purple">🧪</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-info">
+          <h4>Flight Safety</h4>
+          <div class="metric-num" style="color: #10b981;">CLEARED</div>
+          <div class="metric-sub">DGCA Green Airspace • Calm Winds</div>
+        </div>
+        <div class="metric-icon icon-amber">🛡️</div>
+      </div>
+    </div>
+
+    <!-- TAB 1: FLEET TELEMETRY & LIVE MAP -->
+    <section class="tab-pane active" id="tab-telemetry">
+      <div class="telemetry-grid">
+        <!-- Interactive Canvas Map -->
+        <div class="map-container">
+          <div class="map-toolbar">
+            <div class="toolbar-title">
+              <span class="live-indicator"></span>
+              <span>Live Mission: Green Valley Cotton Estate (#BK-001)</span>
+            </div>
+            <div class="toolbar-actions">
+              <button class="btn-ctrl" id="btnToggleSpray">
+                <span>💦</span> Spray: <strong id="sprayStateTxt">ACTIVE</strong>
+              </button>
+              <button class="btn-ctrl" id="btnRth">
+                <span>🏠</span> Return To Home
+              </button>
+              <button class="btn-ctrl btn-primary" id="btnSimPause">
+                <span id="simBtnIcon">⏸️</span> <span id="simBtnTxt">Pause Sim</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="canvas-map-area">
+            <canvas id="flightCanvas"></canvas>
+
+            <!-- Floating Telemetry HUD -->
+            <div class="map-hud-overlay">
+              <div class="hud-item">
+                <div class="hud-label">Altitude (AGL)</div>
+                <div class="hud-val"><span id="hudAltitude">3.8</span><span class="hud-unit">meters</span></div>
+              </div>
+              <div class="hud-item">
+                <div class="hud-label">Ground Speed</div>
+                <div class="hud-val"><span id="hudSpeed">18.5</span><span class="hud-unit">km/h</span></div>
+              </div>
+              <div class="hud-item">
+                <div class="hud-label">Spray Flow Rate</div>
+                <div class="hud-val"><span id="hudFlow">3.4</span><span class="hud-unit">L/min</span></div>
+              </div>
+              <div class="hud-item">
+                <div class="hud-label">GPS Satellites</div>
+                <div class="hud-val"><span id="hudSats">18</span><span class="hud-unit">RTK Fixed</span></div>
+              </div>
+              <div class="hud-item">
+                <div class="hud-label">Signal RSSI</div>
+                <div class="hud-val">-42<span class="hud-unit">dBm (99%)</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry Details Sidebar -->
+        <div class="telemetry-sidebar">
+          <!-- Active Drone Card -->
+          <div class="drone-card-active">
+            <div class="drone-card-header">
+              <div>
+                <h3 class="drone-model-title">AgroDrone Titan T-40</h3>
+                <div class="drone-serial">SN: AGRO-T40-901 • Pilot: Capt. Vikram</div>
+              </div>
+              <span class="status-badge status-in_mission" id="droneStatusBadge">In Mission</span>
+            </div>
+
+            <!-- Battery & Tank Gauges -->
+            <div class="gauge-row">
+              <div class="gauge-box">
+                <div class="gauge-title">Battery Level</div>
+                <div class="hud-val" style="justify-content: center; color: #10b981;">
+                  <span id="droneBatteryVal">88</span>%
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill fill-battery" id="droneBatteryBar" style="width: 88%;"></div>
+                </div>
+                <div style="font-size: 0.7rem; color: #64748b;">18 mins remaining</div>
+              </div>
+
+              <div class="gauge-box">
+                <div class="gauge-title">Spray Tank Level</div>
+                <div class="hud-val" style="justify-content: center; color: #38bdf8;">
+                  <span id="droneTankVal">24.5</span><span class="hud-unit">/ 40L</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill fill-tank" id="droneTankBar" style="width: 61%;"></div>
+                </div>
+                <div style="font-size: 0.7rem; color: #64748b;">Chlorantraniliprole 18.5%</div>
+              </div>
+            </div>
+
+            <div style="font-size: 0.8rem; line-height: 1.6; color: var(--text-muted); background: #0f172a; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border-color);">
+              <div>📍 <strong>Coordinates:</strong> <span id="hudCoords" style="font-family: monospace; color: #fff;">21.145920, 79.088350</span></div>
+              <div>🌾 <strong>Target Crop:</strong> Cotton (15.5 Acres)</div>
+              <div>🛡️ <strong>Obstacle Radar:</strong> Clear (Sensors 360° Omnidirectional Active)</div>
+            </div>
+          </div>
+
+          <!-- Telemetry Flight Logs -->
+          <div class="flight-log-list">
+            <div class="section-head">
+              <span>Flight Events Log</span>
+              <button class="action-btn" id="btnClearLogs">Clear</button>
+            </div>
+            <div id="flightLogsContainer">
+              <!-- Logs injected by script -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: MISSION DISPATCH & BOOKINGS -->
+    <section class="tab-pane" id="tab-dispatch">
+      <div class="data-card">
+        <div class="table-controls">
+          <div class="filter-group">
+            <button class="filter-btn active" data-filter="all">All Missions (<span id="countAll">3</span>)</button>
+            <button class="filter-btn" data-filter="pending">Pending (<span id="countPending">1</span>)</button>
+            <button class="filter-btn" data-filter="assigned">Assigned (<span id="countAssigned">1</span>)</button>
+            <button class="filter-btn" data-filter="in_progress">In Progress (<span id="countInProg">1</span>)</button>
+          </div>
+          <div>
+            <button class="btn-ctrl btn-primary" id="btnQuickNewBooking">
+              <span>➕</span> New Mission Request
+            </button>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="agro-table">
+            <thead>
+              <tr>
+                <th>Booking ID</th>
+                <th>Farmer & Farm</th>
+                <th>Service & Crop</th>
+                <th>Acreage</th>
+                <th>Schedule</th>
+                <th>Total Cost</th>
+                <th>Payment</th>
+                <th>Mission Status</th>
+                <th>Assigned Drone/Pilot</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="bookingsTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: AI CROP INTELLIGENCE & NDVI -->
+    <section class="tab-pane" id="tab-ai-intelligence">
+      <div class="ai-view-grid">
+        <div class="ai-scan-viewer">
+          <div class="section-head">
+            <span>Multispectral AI Canopy Scan (NDVI Analysis)</span>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="action-btn" id="btnToggleNdviView">Toggle NDVI Overlay</button>
+              <button class="action-btn" id="btnRunAiAnalysis">Scan Current Field</button>
+            </div>
+          </div>
+
+          <div class="heatmap-viewport" id="aiHeatmapViewport" style="background-image: url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=800&q=80');">
+            <div class="radar-sweep" style="width: 100%; height: 100%;"></div>
+            <div class="ndvi-scale-bar">
+              <span>1.0</span>
+              <span>0.8</span>
+              <span>0.6</span>
+              <span>0.4</span>
+              <span>0.2</span>
+            </div>
+          </div>
+
+          <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+            <span>Normalized Difference Vegetation Index: <strong id="aiNdviScore" style="color: #10b981; font-size: 1.1rem;">0.785</strong></span>
+            <span style="color: var(--text-muted);">Canopy Coverage: <strong id="aiCanopyCov">86.5%</strong></span>
+          </div>
+        </div>
+
+        <!-- AI Diagnostics & Prescription -->
+        <div class="ai-stats-panel">
+          <div class="data-card alert-pest" id="aiPestBox">
+            <h5>⚠️ Pest Alert: Pink Bollworm (Early Stage)</h5>
+            <p style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.5rem;">
+              Computer vision detected pest cluster in Northeast quadrant of Green Valley Cotton plot.
+            </p>
+            <div style="font-size: 0.8rem; background: rgba(0, 0, 0, 0.3); padding: 0.5rem; border-radius: 4px;">
+              <strong>Prescribed Chemical:</strong> Chlorantraniliprole 18.5% SC @ 60 ml/acre
+            </div>
+          </div>
+
+          <div class="data-card">
+            <h4 style="font-size: 0.9rem; margin-bottom: 0.8rem;">Precision Variable Rate Application (VRA) Map</h4>
+            <div class="vra-grid">
+              <div class="vra-card">
+                <div style="font-size: 0.7rem; color: #94a3b8;">ZONE A (North)</div>
+                <div style="font-weight: 700; color: #10b981;">NDVI 0.82</div>
+                <div style="font-size: 0.75rem;">Spray: 2.2 L/min (Standard)</div>
+              </div>
+              <div class="vra-card" style="border-color: #ef4444; background: rgba(239, 68, 68, 0.08);">
+                <div style="font-size: 0.7rem; color: #ef4444;">ZONE B (East) - INFESTED</div>
+                <div style="font-weight: 700; color: #f87171;">NDVI 0.64</div>
+                <div style="font-size: 0.75rem;">Spray: 3.8 L/min (High Dose)</div>
+              </div>
+              <div class="vra-card">
+                <div style="font-size: 0.7rem; color: #94a3b8;">ZONE C (South)</div>
+                <div style="font-weight: 700; color: #10b981;">NDVI 0.79</div>
+                <div style="font-size: 0.75rem;">Spray: 2.5 L/min (Standard)</div>
+              </div>
+              <div class="vra-card">
+                <div style="font-size: 0.7rem; color: #94a3b8;">ZONE D (West)</div>
+                <div style="font-weight: 700; color: #38bdf8;">NDVI 0.74</div>
+                <div style="font-size: 0.75rem;">Spray: 3.0 L/min (Moderate)</div>
+              </div>
+            </div>
+            <div style="margin-top: 1rem; font-size: 0.8rem; color: #10b981;">
+              💡 <em>Using AI Variable Spraying reduces total pesticide consumption by 38.4% compared to manual tractor spraying.</em>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: FARMER APP VIEW (SIMULATOR) -->
+    <section class="tab-pane" id="tab-farmer-portal">
+      <div class="sim-viewport-container">
+        <div class="phone-mockup">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-header">
+              <div style="font-size: 0.75rem; opacity: 0.9;">KisanFly AgroDrone App</div>
+              <h3>Namaste, Ramesh ji! 🙏</h3>
+              <p style="font-size: 0.8rem; opacity: 0.9;">Book high-yield drone spray in 2 mins</p>
+            </div>
+
+            <div class="phone-body">
+              <form id="farmerBookingForm">
+                <div class="form-group">
+                  <label class="form-label">Select Registered Farm Plot</label>
+                  <select class="form-select" id="farmerFarmSelect">
+                    <option value="1">Green Valley Cotton Estate (15.5 Acres)</option>
+                    <option value="3">Narmada Basin Paddy Plot (12.0 Acres)</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Service Type</label>
+                  <select class="form-select" id="farmerServiceSelect">
+                    <option value="pesticide_spraying">Pesticide Spraying (₹300/acre)</option>
+                    <option value="liquid_fertilizer">Liquid Fertilizer / Nano Urea (₹300/acre)</option>
+                    <option value="ai_crop_scouting">AI Crop Scouting & Health Scan (₹200/acre)</option>
+                    <option value="thermal_imaging">Thermal Moisture Imaging (₹250/acre)</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Area (Acres)</label>
+                  <input type="number" step="0.5" class="form-input" id="farmerAcreInput" value="15.5">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Preferred Date & Slot</label>
+                  <input type="date" class="form-input" id="farmerDateInput" value="2026-11-25">
+                  <select class="form-select" id="farmerSlotSelect" style="margin-top: 0.4rem;">
+                    <option>06:00 - 08:30 AM (Best Wind)</option>
+                    <option>08:30 - 11:00 AM</option>
+                    <option>04:00 - 06:30 PM (Evening)</option>
+                  </select>
+                </div>
+
+                <!-- Price Breakdown Box -->
+                <div style="background: #e2e8f0; border-radius: 8px; padding: 0.8rem; margin-bottom: 1rem; font-size: 0.85rem;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+                    <span>Base Spraying Fee:</span>
+                    <strong id="farmerEstCost">₹4,650</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem; color: #059669;">
+                    <span>Govt Drone Subsidy (25%):</span>
+                    <strong>- ₹1,162.50</strong>
+                  </div>
+                  <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 0.4rem 0;">
+                  <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 0.95rem; color: #064e3b;">
+                    <span>Farmer Payable:</span>
+                    <span id="farmerPayableCost">₹3,487.50</span>
+                  </div>
+                </div>
+
+                <button type="button" class="btn-book-now" id="btnSubmitFarmerBooking">
+                  Proceed to Book Drone Mission
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Farmer App Explanation Side Card -->
+        <div style="max-width: 450px;">
+          <div class="data-card">
+            <h3>Farmer Mobile App Features</h3>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0.8rem 0 1.2rem 0; line-height: 1.6;">
+              Built with Flutter for high performance in vernacular languages (Hindi, Marathi, Punjabi, Telugu).
+            </p>
+            <ul style="font-size: 0.85rem; line-height: 1.8; color: #cbd5e1; padding-left: 1.2rem;">
+              <li><strong>One-Tap Farm GPS Mapping:</strong> Auto-detects agricultural parcel acreage via satellite polygon draw.</li>
+              <li><strong>Instant Weather Advisory:</strong> Tells farmers whether wind and dew conditions are safe for spraying today.</li>
+              <li><strong>Live Uber-Like Tracking:</strong> Real-time map displaying the drone en-route with pilot phone call button.</li>
+              <li><strong>Digital Crop Health Card:</strong> Downloadable NDVI report after every flight.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: OPERATOR COCKPIT VIEW (SIMULATOR) -->
+    <section class="tab-pane" id="tab-operator-cockpit">
+      <div class="sim-viewport-container">
+        <div class="phone-mockup" style="border-color: #334155; width: 420px;">
+          <div class="phone-notch"></div>
+          <div class="phone-screen" style="background: #0f172a; color: #fff;">
+            <div class="phone-header" style="background: linear-gradient(135deg, #1e293b, #0f172a); border-bottom: 1px solid #334155;">
+              <div style="font-size: 0.75rem; color: #38bdf8;">AgroDrone Pilot HUD v2</div>
+              <h3>Capt. Vikram Rathore</h3>
+              <p style="font-size: 0.75rem; color: #94a3b8;">DGCA Drone Pilot License: #DGCA-RPA-99482-B</p>
+            </div>
+
+            <div class="phone-body" style="padding: 1rem;">
+              <!-- Safety Checklist -->
+              <div style="background: #1e293b; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #334155;">
+                <div style="font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 0.4rem;">Pre-Flight Checklist</div>
+                <div style="font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.35rem;">
+                  <label><input type="checkbox" checked disabled> GPS RTK Satellites > 14 (18 OK)</label>
+                  <label><input type="checkbox" checked disabled> Battery Voltage > 48V (51.2V OK)</label>
+                  <label><input type="checkbox" checked disabled> Spray Nozzle Flow Calibration (OK)</label>
+                  <label><input type="checkbox" checked disabled> DGCA Airspace Clearance (GREEN)</label>
+                </div>
+              </div>
+
+              <!-- Cockpit Controls -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem;">
+                <button class="btn-ctrl btn-primary" id="btnCockpitArm" style="padding: 0.9rem; justify-content: center; font-size: 0.9rem;">
+                  🟢 MOTORS ARMED
+                </button>
+                <button class="btn-ctrl" id="btnCockpitTakeoff" style="padding: 0.9rem; justify-content: center; font-size: 0.9rem;">
+                  🚀 AUTO MISSION
+                </button>
+              </div>
+
+              <div style="background: #1e293b; padding: 0.8rem; border-radius: 8px; border: 1px solid #334155;">
+                <div style="font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 0.4rem;">Spray Nozzle Output Control</div>
+                <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;">
+                  <span>Flow Rate: <strong id="cockpitFlowRate">3.4 L/min</strong></span>
+                  <input type="range" min="1" max="5" step="0.2" value="3.4" id="cockpitFlowSlider">
+                </div>
+              </div>
+
+              <!-- Live Telemetry Status in Cockpit -->
+              <div style="margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; text-align: center;">
+                <div style="background: #1e293b; padding: 0.6rem; border-radius: 6px;">
+                  <div style="font-size: 0.65rem; color: #94a3b8;">PITCH / ROLL</div>
+                  <div style="font-weight: 700; color: #38bdf8;">+1.2° / -0.8°</div>
+                </div>
+                <div style="background: #1e293b; padding: 0.6rem; border-radius: 6px;">
+                  <div style="font-size: 0.65rem; color: #94a3b8;">WIND ADVISORY</div>
+                  <div style="font-weight: 700; color: #10b981;">6.4 KM/H SAFE</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="max-width: 450px;">
+          <div class="data-card">
+            <h3>Operator & Drone Pilot Features</h3>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0.8rem 0 1.2rem 0; line-height: 1.6;">
+              Empowers DGCA-certified commercial drone operators to execute autonomous flight missions safely with real-time telemetry streaming to cloud base.
+            </p>
+            <ul style="font-size: 0.85rem; line-height: 1.8; color: #cbd5e1; padding-left: 1.2rem;">
+              <li><strong>Autonomous Lawnmower Grid:</strong> Pre-programmed waypoint path ensuring zero overlapping and 100% boundary coverage.</li>
+              <li><strong>Failsafe RTH (Return-To-Home):</strong> Auto-triggers on low battery (< 20%), chemical tank depletion, or signal loss.</li>
+              <li><strong>Digital Flight Logbook:</strong> Auto-records flight hours, pilot license numbers, and chemicals dispensed for government compliance.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: Assign Pilot & Drone -->
+  <div class="modal-overlay" id="assignModal">
+    <div class="modal-content">
+      <div class="modal-head">
+        <h3 style="font-size: 1.15rem;">Assign Mission Dispatch</h3>
+        <button class="close-btn" id="closeAssignModal">&times;</button>
+      </div>
+      <div>
+        <input type="hidden" id="assignBookingId">
+        <div class="form-group">
+          <label class="form-label">Select Commercial Drone</label>
+          <select class="form-select" id="selectDrone">
+            <option value="1">AgroDrone Titan T-40 (40L Capacity • 88% Batt)</option>
+            <option value="2">AgroDrone Precision P-20 (20L Capacity • 95% Batt)</option>
+            <option value="4">AgroDrone HeavyLifter H-50 (50L Capacity • 100% Batt)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Select Certified Pilot / Operator</label>
+          <select class="form-select" id="selectPilot">
+            <option value="2">Capt. Vikram Rathore (#DGCA-RPA-99482-B)</option>
+            <option value="3">Anita Sharma (#DGCA-RPA-44219-A)</option>
+          </select>
+        </div>
+        <button class="btn-ctrl btn-primary" id="btnConfirmAssign" style="width: 100%; justify-content: center; padding: 0.75rem; margin-top: 1rem;">
+          Confirm Mission Dispatch
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: GST Tax Invoice -->
+  <div class="modal-overlay" id="invoiceModal">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-head">
+        <h3>Official Agricultural Service Tax Invoice</h3>
+        <button class="close-btn" id="closeInvoiceModal">&times;</button>
+      </div>
+      <div id="invoiceDetails" style="font-size: 0.85rem; line-height: 1.7; background: #0f172a; padding: 1.2rem; border-radius: 8px;">
+        <!-- Injected by JS -->
+      </div>
+      <button class="btn-ctrl btn-primary" style="margin-top: 1rem; width: 100%; justify-content: center;" onclick="window.print()">
+        🖨️ Print / Download PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- JavaScript Application Logic -->
+  <script src="script.js"></script>
+</body>
+</html>
