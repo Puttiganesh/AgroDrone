@@ -4,7 +4,7 @@ FastAPI server connecting Farmers, Drone Pilots/Operators, and Admin Dispatchers
 """
 
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, RedirectResponse
@@ -43,6 +43,7 @@ app.include_router(payment_router)
 
 # Mount Admin Website Static Assets
 ADMIN_WEB_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "admin_website"))
+PUBLIC_WEB_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "public"))
 
 if os.path.exists(ADMIN_WEB_DIR):
     app.mount("/admin", StaticFiles(directory=ADMIN_WEB_DIR, html=True), name="admin_website")
@@ -59,10 +60,30 @@ def on_startup():
 
 @app.get("/")
 def root():
-    index_path = os.path.join(ADMIN_WEB_DIR, "index.html")
+    index_path = os.path.join(PUBLIC_WEB_DIR, "index.html")
+    if not os.path.exists(index_path):
+        index_path = os.path.join(ADMIN_WEB_DIR, "index.html")
     if os.path.exists(index_path):
         return FileResponse(index_path)
-    return RedirectResponse(url="/admin")
+    raise HTTPException(status_code=404, detail="Dashboard not found")
+
+@app.get("/style.css")
+def dashboard_styles():
+    style_path = os.path.join(PUBLIC_WEB_DIR, "style.css")
+    if not os.path.exists(style_path):
+        style_path = os.path.join(ADMIN_WEB_DIR, "style.css")
+    if os.path.exists(style_path):
+        return FileResponse(style_path, media_type="text/css")
+    raise HTTPException(status_code=404, detail="Stylesheet not found")
+
+@app.get("/script.js")
+def dashboard_script():
+    script_path = os.path.join(PUBLIC_WEB_DIR, "script.js")
+    if not os.path.exists(script_path):
+        script_path = os.path.join(ADMIN_WEB_DIR, "script.js")
+    if os.path.exists(script_path):
+        return FileResponse(script_path, media_type="application/javascript")
+    raise HTTPException(status_code=404, detail="Script not found")
 
 @app.get("/api/health")
 def health_check():
