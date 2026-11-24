@@ -59,6 +59,9 @@ def on_startup():
 
 @app.get("/")
 def root():
+    index_path = os.path.join(ADMIN_WEB_DIR, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
     return RedirectResponse(url="/admin")
 
 @app.get("/api/health")
