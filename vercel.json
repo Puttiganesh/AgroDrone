@@ -4,5 +4,10 @@
     { "src": "/api/(.*)", "dest": "/api/index.py" },
     { "src": "/docs", "dest": "/api/index.py" },
     { "src": "/openapi.json", "dest": "/api/index.py" }
-  ]
+  ],
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "agroDrone/**"
+    }
+  }
 }
