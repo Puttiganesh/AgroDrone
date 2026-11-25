@@ -8,7 +8,7 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from database import get_db
-from models import UserLogin, UserRegister, UserOut, TokenResponse
+from models import UserLogin, MobilePasswordLogin, UserRegister, UserOut, TokenResponse
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 security = HTTPBearer()
@@ -92,6 +92,25 @@ def login(creds: UserLogin):
         )
         return TokenResponse(access_token=str(row["id"]), user=user_out)
 
+@router.post("/login/password", response_model=TokenResponse)
+def login_with_mobile(creds: MobilePasswordLogin):
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT id, full_name, email, password_hash, phone, role, license_number FROM users WHERE phone = ? AND role = ?",
+            (creds.phone, creds.role)
+        ).fetchone()
+        if not row or not verify_password(creds.password, row["password_hash"]):
+            raise HTTPException(status_code=401, detail="Invalid mobile number or password.")
+
+        user_out = UserOut(
+            id=row["id"],
+            full_name=row["full_name"],
+            email=row["email"],
+            phone=row["phone"],
+            role=row["role"],
+            license_number=row["license_number"]
+        )
+        return TokenResponse(access_token=str(row["id"]), user=user_out)
 @router.get("/me", response_model=UserOut)
 def get_profile(current_user: dict = Depends(get_current_user)):
     return UserOut(**current_user)

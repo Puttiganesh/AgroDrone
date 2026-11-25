@@ -10,6 +10,10 @@ class UserLogin(BaseModel):
     email: str
     password: str
 
+class MobilePasswordLogin(BaseModel):
+    phone: str = Field(pattern=r"^[0-9]{10}$")
+    password: str = Field(min_length=1, max_length=128)
+    role: str = Field(pattern=r"^(operator|farmer)$")
 class UserRegister(BaseModel):
     full_name: str
     email: str

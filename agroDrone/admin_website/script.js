@@ -1580,13 +1580,10 @@ const STATE = {
   backendUrl: "http://localhost:8000/api",
   accessToken: null,
   currentUser: null,
-  guestMode: false,
   currentRole: "farmer",
   currentLang: localStorage.getItem("agro_selected_lang") || "en",
   currentTheme: "dark",
   passwordResetRole: "farmer",
-  loginVerificationEmail: null,
-  loginVerificationRole: null,
   currentFarmLocation: null,
   simRunning: true,
   simStep: 0,
@@ -1900,9 +1897,6 @@ function triggerDroneBoost() {
 
 function switchAuthRole(role) {
   STATE.currentRole = role;
-  if (STATE.loginVerificationRole && STATE.loginVerificationRole !== role) {
-    backToPasswordLogin(STATE.loginVerificationRole);
-  }
   const farmerTab = document.getElementById("tabFarmerBtn");
   const droneTab = document.getElementById("tabDroneBtn");
   const farmerForm = document.getElementById("farmerLoginForm");
@@ -1977,81 +1971,30 @@ async function passwordLogin(event, role) {
   const password = document.getElementById(isFarmer ? "farmerPassword" : "operatorPassword").value;
   const message = document.getElementById(role === "farmer" ? "farmerAuthMessage" : "operatorAuthMessage");
   const form = document.getElementById(isFarmer ? "farmerCredentialsForm" : "operatorCredentialsForm");
-  const codeForm = document.getElementById(isFarmer ? "farmerLoginCodeForm" : "operatorLoginCodeForm");
   const submitButton = form.querySelector('button[type="submit"]');
   submitButton.disabled = true;
-  message.textContent = portalText("auth_login_sending_code");
+  message.textContent = "Signing in...";
 
   try {
-    const result = await postAuthRequest("login", { identifier, password, role });
-    if (!result.masked_email) {
-      throw new Error("The sign-in code response was incomplete. Please try again.");
+    const result = await postAuthRequest("login/password", {
+      phone: identifier,
+      password,
+      role
+    });
+    if (!result.access_token || !result.user || result.user.role !== role) {
+      throw new Error("The login response was incomplete. Check your account and try again.");
     }
-    STATE.loginVerificationEmail = result.email;
-    if (!STATE.loginVerificationEmail) {
-      throw new Error("The sign-in response did not include the account email.");
-    }
-    STATE.loginVerificationRole = role;
-    form.hidden = true;
-    codeForm.hidden = false;
-    document.getElementById(isFarmer ? "farmerLoginCode" : "operatorLoginCode").focus();
-    message.textContent = portalText("auth_login_code_sent")
-      .replace("{email}", result.masked_email);
+    STATE.accessToken = result.access_token;
+    sessionStorage.setItem("agrodrone_access_token", result.access_token);
+    message.textContent = "";
+    if (isFarmer) loginAsFarmer(result.user);
+    else loginAsDrone(result.user);
   } catch (error) {
     message.textContent = error.message || "Sign-in failed. Check your account details and try again.";
     console.error("Password sign-in failed.", error);
   } finally {
     submitButton.disabled = false;
   }
-}
-
-async function handleLoginCode(event, role) {
-  event.preventDefault();
-  const isFarmer = role === "farmer";
-  const codeForm = document.getElementById(isFarmer ? "farmerLoginCodeForm" : "operatorLoginCodeForm");
-  const submitButton = codeForm.querySelector('button[type="submit"]');
-  const message = document.getElementById(isFarmer ? "farmerAuthMessage" : "operatorAuthMessage");
-  const code = document.getElementById(isFarmer ? "farmerLoginCode" : "operatorLoginCode").value.trim();
-  submitButton.disabled = true;
-  message.textContent = portalText("auth_login_verifying_code");
-
-  try {
-    const result = await postAuthRequest("login/verify-code", {
-      email: STATE.loginVerificationEmail,
-      role,
-      code
-    });
-    if (!result.user || result.user.role !== role) {
-      throw new Error("This account cannot sign in to the selected portal.");
-    }
-    STATE.accessToken = result.access_token;
-    STATE.guestMode = false;
-    STATE.loginVerificationEmail = null;
-    STATE.loginVerificationRole = null;
-    sessionStorage.setItem("agrodrone_access_token", result.access_token);
-    message.textContent = "";
-    if (isFarmer) loginAsFarmer(result.user);
-    else loginAsDrone(result.user);
-  } catch (error) {
-    message.textContent = error.message || "The code could not be verified. Please try again.";
-    console.error("Email sign-in code verification failed.", error);
-  } finally {
-    submitButton.disabled = false;
-  }
-}
-
-function backToPasswordLogin(role) {
-  const isFarmer = role === "farmer";
-  const credentialsForm = document.getElementById(isFarmer ? "farmerCredentialsForm" : "operatorCredentialsForm");
-  const codeForm = document.getElementById(isFarmer ? "farmerLoginCodeForm" : "operatorLoginCodeForm");
-  credentialsForm.hidden = false;
-  codeForm.hidden = true;
-  codeForm.reset();
-  if (STATE.loginVerificationRole === role) {
-    STATE.loginVerificationEmail = null;
-    STATE.loginVerificationRole = null;
-  }
-  document.getElementById(isFarmer ? "farmerAuthMessage" : "operatorAuthMessage").textContent = "";
 }
 
 function handleFarmerLogin(event) {
@@ -2062,30 +2005,24 @@ function handleDroneLogin(event) {
   return passwordLogin(event, "operator");
 }
 
-function openGuestPortal(role) {
-  STATE.guestMode = true;
-  STATE.accessToken = null;
-  sessionStorage.removeItem("agrodrone_access_token");
+function openPortalLogin(role) {
+  document.getElementById("publicPortalSelection").hidden = true;
+  document.getElementById("authLoginGateway").hidden = false;
+  switchAuthRole(role === "operator" ? "drone" : "farmer");
+  document.getElementById(role === "operator" ? "dronePilotId" : "farmerEmail").focus();
+}
 
-  const guestUser = role === "farmer"
-    ? { id: null, full_name: "Farmer Guest", email: "", phone: "" }
-    : { id: null, full_name: "Operator Guest", email: "" };
-
-  if (role === "farmer") loginAsFarmer(guestUser);
-  else loginAsDrone(guestUser);
+function returnToPortalSelection() {
+  document.getElementById("authLoginGateway").hidden = true;
+  document.getElementById("publicPortalSelection").hidden = false;
+  setAuthMode("farmer", "login");
+  setAuthMode("operator", "login");
 }
 
 function setAuthMode(role, mode) {
   const isFarmer = role === "farmer";
   document.getElementById(isFarmer ? "farmerCredentialsForm" : "operatorCredentialsForm").hidden =
     mode !== "login";
-  const codeForm = document.getElementById(isFarmer ? "farmerLoginCodeForm" : "operatorLoginCodeForm");
-  codeForm.hidden = true;
-  codeForm.reset();
-  if (STATE.loginVerificationRole === role) {
-    STATE.loginVerificationEmail = null;
-    STATE.loginVerificationRole = null;
-  }
   document.getElementById(isFarmer ? "farmerRegisterForm" : "operatorRegisterForm").hidden =
     mode !== "register";
   document.getElementById(isFarmer ? "farmerAuthMessage" : "operatorAuthMessage").textContent = "";
@@ -2178,9 +2115,6 @@ async function handlePasswordResetConfirm(event) {
     closePasswordReset();
     setAuthMode(role, "login");
     document.getElementById(
-      role === "farmer" ? "farmerEmail" : "dronePilotId"
-    ).value = email;
-    document.getElementById(
       role === "farmer" ? "farmerAuthMessage" : "operatorAuthMessage"
     ).textContent = portalText("auth_reset_complete");
   } catch (error) {
@@ -2214,7 +2148,7 @@ async function registerAccount(event, role) {
   try {
     await postAuthRequest("register", payload);
     setAuthMode(role, "login");
-    document.getElementById(isFarmer ? "farmerEmail" : "dronePilotId").value = payload.email;
+    document.getElementById(isFarmer ? "farmerEmail" : "dronePilotId").value = payload.phone;
     form.reset();
     message.textContent = "Account created. Sign in with your email and password.";
   } catch (error) {
@@ -2240,13 +2174,11 @@ function loginAsFarmer(user) {
   document.getElementById("appScreen").style.display = "flex";
 
   const badge = document.getElementById("userRoleBadge");
-  badge.textContent = STATE.guestMode ? "Farmer Preview" : "Farmer Portal";
+  badge.textContent = "Farmer Portal";
   badge.style.background = "rgba(16, 185, 129, 0.2)";
   badge.style.color = "#10b981";
   badge.style.borderColor = "rgba(16, 185, 129, 0.4)";
-  document.getElementById("userRoleSub").textContent = STATE.guestMode
-    ? "Public preview • Sign-in not used"
-    : `Connected: ${STATE.currentUser.name} • ${STATE.currentUser.farm}`;
+  document.getElementById("userRoleSub").textContent = `Connected: ${STATE.currentUser.name} • ${STATE.currentUser.farm}`;
 
   // KPI updates
   document.getElementById("kpi1Title").textContent = I18N_TRANSLATIONS[STATE.currentLang]?.kpi_active_mission || "Active Mission";
@@ -2264,8 +2196,7 @@ function loginAsFarmer(user) {
   document.getElementById("viewFarmerContainer").style.display = "block";
   document.getElementById("viewDroneContainer").style.display = "none";
 
-  if (STATE.guestMode) refreshRoleDashboard();
-  else loadRoleBookings();
+  loadRoleBookings();
 }
 
 function loginAsDrone(user) {
@@ -2280,21 +2211,16 @@ function loginAsDrone(user) {
   document.getElementById("appScreen").style.display = "flex";
 
   const badge = document.getElementById("userRoleBadge");
-  badge.textContent = STATE.guestMode ? "Operator Preview" : "Drone Operator";
+  badge.textContent = "Drone Operator";
   badge.style.background = "rgba(56, 189, 248, 0.2)";
   badge.style.color = "#38bdf8";
   badge.style.borderColor = "rgba(56, 189, 248, 0.4)";
-  document.getElementById("userRoleSub").textContent = STATE.guestMode
-    ? "Public preview • Sign-in not used"
-    : `Operator: ${user.full_name}`;
+  document.getElementById("userRoleSub").textContent = `Operator: ${user.full_name}`;
 
   document.getElementById("viewFarmerContainer").style.display = "none";
   document.getElementById("viewDroneContainer").style.display = "block";
-  if (STATE.guestMode) refreshRoleDashboard();
-  else {
-    loadOperatorPricing();
-    loadRoleBookings();
-  }
+  loadOperatorPricing();
+  loadRoleBookings();
 }
 
 function logout() {
@@ -2309,9 +2235,9 @@ function logout() {
   sessionStorage.removeItem("agrodrone_access_token");
   STATE.currentUser = null;
   STATE.currentFarmLocation = null;
-  STATE.guestMode = false;
   document.getElementById("appScreen").style.display = "none";
   document.getElementById("authScreen").style.display = "flex";
+  returnToPortalSelection();
 }
 
 function refreshRoleDashboard() {
@@ -2466,10 +2392,6 @@ function updateFarmerQuote() {
 
 async function loadOperatorPricing() {
   const status = document.getElementById("operatorPriceStatus");
-  if (STATE.guestMode) {
-    status.textContent = "Pricing is unavailable in public preview mode.";
-    return;
-  }
   try {
     const result = await apiRequest("auth/operator-pricing");
     const input = document.getElementById("operatorPricePerAcre");
@@ -2487,10 +2409,6 @@ async function loadOperatorPricing() {
 }
 
 async function loadRoleBookings() {
-  if (STATE.guestMode) {
-    refreshRoleDashboard();
-    return;
-  }
   try {
     const bookings = await apiRequest("bookings/dashboard");
     renderPaymentHistory(bookings);

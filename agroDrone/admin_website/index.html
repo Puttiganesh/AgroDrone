@@ -183,27 +183,27 @@
       </div>
 
       <div id="publicPortalSelection">
-        <p class="auth-hint">Choose a portal. Sign-in is not required to open the preview.</p>
+        <p class="auth-hint">Choose a portal and sign in with your mobile number and password.</p>
         <div class="auth-role-tabs">
-          <button type="button" class="auth-tab-btn" onclick="openGuestPortal('farmer')">
+          <button type="button" class="auth-tab-btn" onclick="openPortalLogin('farmer')">
             <span style="font-size: 1.2rem;">👨‍🌾</span>
             <div>
-              <strong>Farmer Portal</strong>
-              <small>Book spray &amp; track missions</small>
+              <strong>Farmer Login</strong>
+              <small>Enter the farmer portal</small>
             </div>
           </button>
-          <button type="button" class="auth-tab-btn" onclick="openGuestPortal('operator')">
+          <button type="button" class="auth-tab-btn" onclick="openPortalLogin('operator')">
             <span style="font-size: 1.2rem;">🛸</span>
             <div>
-              <strong>Drone Operator Portal</strong>
-              <small>Manage requests and spraying</small>
+              <strong>Drone Operator Login</strong>
+              <small>Enter the operator portal</small>
             </div>
           </button>
         </div>
-        <p class="auth-hint">Live bookings and operator updates still require an authorized backend account.</p>
       </div>
 
       <div id="authLoginGateway" hidden>
+      <button type="button" class="auth-form-back" onclick="returnToPortalSelection()">Back to portal selection</button>
       <!-- Role Switcher Tabs -->
       <div class="auth-role-tabs">
         <button class="auth-tab-btn active" id="tabFarmerBtn" onclick="switchAuthRole('farmer')">
@@ -226,8 +226,8 @@
       <div id="farmerLoginForm" class="auth-form-panel">
         <form id="farmerCredentialsForm" onsubmit="handleFarmerLogin(event)">
           <div class="form-group">
-            <label class="form-label" for="farmerEmail" data-i18n="lbl_farmer_email">Phone number / Email</label>
-            <input type="text" id="farmerEmail" class="form-input" required autocomplete="username" maxlength="254" pattern="(?:[0-9]{10}|[^\s@]+@[^\s@]+\.[^\s@]+)" title="Enter a 10-digit phone number or a valid email address." data-i18n-title="auth_farmer_phone_title" placeholder="Enter 10-digit phone number or email" data-i18n-ph="ph_farmer_email">
+            <label class="form-label" for="farmerEmail">Mobile number</label>
+            <input type="tel" id="farmerEmail" class="form-input" required inputmode="numeric" autocomplete="tel" maxlength="10" pattern="[0-9]{10}" title="Enter your 10-digit mobile number." placeholder="Enter 10-digit mobile number">
           </div>
           <div class="form-group">
             <label class="form-label" for="farmerPassword" data-i18n="lbl_password">Password</label>
@@ -239,16 +239,6 @@
           <button type="submit" class="btn-primary-auth">
             <span>👨‍🌾</span> <span data-i18n="btn_farmer_login">Login</span>
           </button>
-        </form>
-        <form id="farmerLoginCodeForm" onsubmit="handleLoginCode(event, 'farmer')" hidden>
-          <div class="form-group">
-            <label class="form-label" for="farmerLoginCode" data-i18n="auth_reset_code">6-digit verification code</label>
-            <input type="text" id="farmerLoginCode" class="form-input" required inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="Enter the code from your email" data-i18n-ph="auth_reset_code_placeholder">
-          </div>
-          <button type="submit" class="btn-primary-auth">
-            <span data-i18n="auth_login_verify">Verify and sign in</span>
-          </button>
-          <button type="button" class="auth-form-back" onclick="backToPasswordLogin('farmer')" data-i18n="auth_login_back">Back to password</button>
         </form>
         <form id="farmerRegisterForm" onsubmit="registerAccount(event, 'farmer')" hidden>
           <div class="form-group">
@@ -281,8 +271,8 @@
       <div id="droneLoginForm" class="auth-form-panel" style="display: none;">
         <form id="operatorCredentialsForm" onsubmit="handleDroneLogin(event)">
           <div class="form-group">
-            <label class="form-label" for="dronePilotId" data-i18n="auth_operator_identifier">Operator ID / Email</label>
-            <input type="text" id="dronePilotId" class="form-input" required autocomplete="username" placeholder="Enter operator ID or email" data-i18n-ph="auth_operator_placeholder">
+            <label class="form-label" for="dronePilotId">Mobile number</label>
+            <input type="tel" id="dronePilotId" class="form-input" required inputmode="numeric" autocomplete="tel" maxlength="10" pattern="[0-9]{10}" title="Enter your 10-digit mobile number." placeholder="Enter 10-digit mobile number">
           </div>
           <div class="form-group">
             <label class="form-label" for="operatorPassword" data-i18n="lbl_password">Password</label>
@@ -294,16 +284,6 @@
           <button type="submit" class="btn-primary-auth btn-drone-color">
             <span>🛸</span> <span data-i18n="auth_operator_login">Login</span>
           </button>
-        </form>
-        <form id="operatorLoginCodeForm" onsubmit="handleLoginCode(event, 'operator')" hidden>
-          <div class="form-group">
-            <label class="form-label" for="operatorLoginCode" data-i18n="auth_reset_code">6-digit verification code</label>
-            <input type="text" id="operatorLoginCode" class="form-input" required inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="Enter the code from your email" data-i18n-ph="auth_reset_code_placeholder">
-          </div>
-          <button type="submit" class="btn-primary-auth btn-drone-color">
-            <span data-i18n="auth_login_verify">Verify and sign in</span>
-          </button>
-          <button type="button" class="auth-form-back" onclick="backToPasswordLogin('operator')" data-i18n="auth_login_back">Back to password</button>
         </form>
         <form id="operatorRegisterForm" onsubmit="registerAccount(event, 'operator')" hidden>
           <div class="form-group">
