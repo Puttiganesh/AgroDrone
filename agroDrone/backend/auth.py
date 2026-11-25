@@ -7,6 +7,7 @@ import secrets
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from database import get_db
 from models import UserLogin, UserRegister, UserOut, TokenResponse
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
